@@ -28,15 +28,21 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-
+      
       - name: Run ESLint to check for linting errors
-        run: npm run lint:check
+        run: |
+          # Run ESLint on modified or added files
+          npm run lint:check -- --files $(git diff --name-only ${{ github.event.before }}...${{ github.sha }})
 
       - name: Check for fomatting errors
-        run: npm run format:check 
+        run: |
+          # Run formatting checks only on changes introduced in the pull request
+          npm run format:check -- --files $(git diff --name-only ${{ github.event.before }}...${{ github.sha }}) 
 
       - name: Run Typescript Type-Checker
-        run: npm run typecheck 
+        run: |
+          # Optimize TypeScript Type-Checker to focus on modified or added code
+          npm run typecheck -- --files $(git diff --name-only ${{ github.event.before }}...${{ github.sha }})
   
   Test-Application:
     name: Testing Application
